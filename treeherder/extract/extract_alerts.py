@@ -13,7 +13,6 @@ from mo_logs import (Log,
                      constants,
                      startup)
 from mo_sql import SQL
-from mo_threads import Till
 from mo_times import (DAY,
                       Timer)
 from mo_times.dates import (Date,
@@ -34,9 +33,6 @@ class ExtractAlerts:
         settings = startup.read_settings(filename=CONFIG_FILE)
         constants.set(settings.constants)
         Log.start(settings.debug)
-
-        logger.info("start")
-        Log.note("start")
 
         if not settings.extractor.app_name:
             Log.error("Expecting an extractor.app_name in config file")
@@ -140,5 +136,4 @@ class ExtractAlerts:
             Log.warning("problem with merge", cause=e)
 
         Log.note("done alert merge")
-        Till(seconds=100000).wait()
         Log.stop()
