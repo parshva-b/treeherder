@@ -16,9 +16,6 @@ echo "Running isort"
 isort --check-only --diff --quiet \
  || { echo "isort errors found! Run 'isort' with no options to fix."; exit 1; }
 
-echo "Running Prettier"
-yarn format:check
-
 echo "Running shellcheck"
 git grep -El '^#!/.+\b(bash|sh)\b' | xargs shellcheck
 
