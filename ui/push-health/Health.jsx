@@ -1,6 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Navbar, Nav, Container, Row, Spinner } from 'reactstrap';
+import {
+  Button,
+  Navbar,
+  Nav,
+  Container,
+  Row,
+  Spinner,
+  FormGroup,
+  Label,
+  Input,
+} from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCheckCircle,
@@ -42,6 +52,7 @@ export default class Health extends React.PureComponent {
       buildsExpanded: false,
       testsExpanded: false,
       performanceExpanded: false,
+      filterStr: '',
     };
   }
 
@@ -114,6 +125,10 @@ export default class Health extends React.PureComponent {
     });
   };
 
+  filter = filterStr => {
+    this.setState({ filterStr });
+  };
+
   render() {
     const {
       metrics,
@@ -129,6 +144,7 @@ export default class Health extends React.PureComponent {
       buildsExpanded,
       testsExpanded,
       performanceExpanded,
+      filterStr,
     } = this.state;
     const { tests, linting, builds, performance } = metrics;
     const { currentRepo } = this.props;
@@ -149,37 +165,55 @@ export default class Health extends React.PureComponent {
           repo={repo}
           revision={revision}
         >
-          <Navbar color="light" light expand="sm" sticky="top">
+          <Navbar color="light" light expand="sm">
             {!!tests && (
-              <Nav className="metric-buttons mb-3 pt-2 pl-3">
-                {[progress, linting, builds, tests, performance].map(metric => (
-                  <Button
-                    size="sm"
-                    className="mr-2"
-                    color={resultColorMap[metric.result]}
-                    title={`Click to toggle ${
-                      metric.name
-                    }: ${metric.result.toUpperCase()}`}
-                    onClick={() => this.toggleExpanded(metric.name)}
-                    key={metric.name}
-                  >
-                    {metric.name}
-                    {['pass', 'fail', 'indeterminate'].includes(
-                      metric.result,
-                    ) ? (
-                      <FontAwesomeIcon
-                        className="ml-1"
-                        icon={
-                          metric.result === 'pass'
-                            ? faCheckCircle
-                            : faExclamationTriangle
-                        }
-                      />
-                    ) : (
-                      <span className="ml-1">{metric.value}%</span>
-                    )}
-                  </Button>
-                ))}
+              <Nav className="metric-buttons mb-3 pt-2 pl-3 justify-content-between w-100">
+                <span>
+                  {[progress, linting, builds, tests, performance].map(
+                    metric => (
+                      <Button
+                        size="sm"
+                        className="mr-2"
+                        color={resultColorMap[metric.result]}
+                        title={`Click to toggle ${
+                          metric.name
+                        }: ${metric.result.toUpperCase()}`}
+                        onClick={() => this.toggleExpanded(metric.name)}
+                        key={metric.name}
+                      >
+                        {metric.name}
+                        {['pass', 'fail', 'indeterminate'].includes(
+                          metric.result,
+                        ) ? (
+                          <FontAwesomeIcon
+                            className="ml-1"
+                            icon={
+                              metric.result === 'pass'
+                                ? faCheckCircle
+                                : faExclamationTriangle
+                            }
+                          />
+                        ) : (
+                          <span className="ml-1">{metric.value}%</span>
+                        )}
+                      </Button>
+                    ),
+                  )}
+                </span>
+                <FormGroup className="mb-0">
+                  <Label htmlFor="filter" hidden>
+                    Filter
+                  </Label>
+                  <Input
+                    className=""
+                    type="text"
+                    name="filter"
+                    id="filter"
+                    defaultValue={filterStr}
+                    placeholder="Filter test paths"
+                    onChange={e => this.filter(e.target.value)}
+                  />
+                </FormGroup>
               </Nav>
             )}
           </Navbar>
@@ -232,6 +266,7 @@ export default class Health extends React.PureComponent {
                   notify={this.notify}
                   expanded={testsExpanded}
                   toggleExpanded={this.toggleExpanded}
+                  filterStr={filterStr}
                 />
               </Row>
               <Row>
